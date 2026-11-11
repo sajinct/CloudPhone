@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#132d29">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="Malayalam news channels on YouTube, made for your keypad phone.">
+  <title>Kerala News</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main id="app">
+    <header class="masthead">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h1 id="heading">Kerala News</h1>
+      <span class="edition" id="edition">TV</span>
+    </header>
+
+    <section id="channels-view" class="channels-view" aria-label="News channels">
+      <div class="section-label"><span>Malayalam · YouTube</span><span id="channel-count">1 / 9</span></div>
+      <div id="channel-list" class="channel-list" role="group" aria-label="Choose a channel"></div>
+      <p class="list-hint">Press 1–9 to tune in</p>
+    </section>
+
+    <section id="watch-view" class="watch-view" aria-label="Watch channel" hidden>
+      <div id="player-container" class="player-container"></div>
+      <div class="watch-info">
+        <p id="status" role="status" aria-live="polite">Connecting to YouTube…</p>
+        <button id="youtube-link" class="text-button" hidden>Open in YouTube ↗</button>
+      </div>
+    </section>
+
+    <section id="panel" class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
+      <h2 id="panel-title">Options</h2>
+      <div id="panel-content" class="panel-content"></div>
+    </section>
+
+    <footer class="softkeys" aria-label="Phone soft keys">
+      <button id="soft-left" aria-label="Options (left soft key or Escape)">Options</button>
+      <button id="soft-center" class="soft-center">Watch</button>
+      <button id="soft-right">Exit</button>
+    </footer>
+  </main>
+  <noscript>Enable JavaScript to choose and play news channels.</noscript>
+</body>
+</html>

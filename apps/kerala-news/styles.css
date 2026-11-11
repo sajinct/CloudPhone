@@ -1,0 +1,111 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, Roboto, sans-serif;
+  color: #182e2a;
+  background: #e5e8e3;
+  font-synthesis: none;
+  --green: #132d29;
+  --paper: #f8f7f0;
+  --red: #bb352d;
+}
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+button { color: inherit; font: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid #bb352d; outline-offset: -2px; }
+[hidden] { display: none !important; }
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--paper);
+}
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  flex: 0 0 40px;
+  color: #fffdf4;
+  background: var(--green);
+  border-bottom: 3px solid var(--red);
+}
+h1 { margin: 0; flex: 1; font-size: 20px; line-height: 1.1; }
+.edition { font-size: 10px; font-weight: bold; letter-spacing: 1px; border: 1px solid #68817a; padding: 3px; }
+.brand-mark { width: 17px; height: 18px; display: flex; align-items: end; gap: 2px; }
+.brand-mark span { width: 4px; background: #f1c36d; height: 9px; }
+.brand-mark span:nth-child(2) { height: 17px; }
+.brand-mark span:nth-child(3) { height: 13px; }
+.channels-view { min-height: 0; flex: 1; display: flex; flex-direction: column; }
+.section-label { display: flex; justify-content: space-between; gap: 4px; padding: 7px 10px; font-size: 11px; color: #59665e; border-bottom: 1px solid #d8dcd1; }
+#channel-count { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.channel-list { min-height: 0; overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: #88978e transparent; padding: 3px 6px; }
+.channel {
+  width: 100%;
+  min-height: 41px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px;
+  border: 0;
+  border-bottom: 1px solid #e2e4da;
+  border-radius: 3px;
+  background: transparent;
+  text-align: left;
+}
+.channel-number { width: 25px; height: 25px; flex: 0 0 25px; display: grid; place-items: center; background: #e9e9df; border-radius: 4px; font: bold 12px monospace; }
+.channel-name { flex: 1; font-size: 16px; font-weight: bold; overflow-wrap: anywhere; }
+.channel-arrow { font-size: 16px; color: #6c786d; }
+.channel.selected { background: var(--green); color: white; border-color: var(--green); outline: none; }
+.channel.selected .channel-number { background: #efc572; color: var(--green); }
+.channel.selected .channel-arrow { color: #efc572; }
+.list-hint { margin: 0; padding: 5px; text-align: center; font-size: 11px; color: #626e63; border-top: 1px solid #e2e4da; }
+.softkeys { display: flex; justify-content: space-between; align-items: stretch; flex: 0 0 28px; background: var(--green); color: white; border-top: 1px solid #40554e; z-index: 3; }
+.softkeys button { min-width: 0; flex: 1; border: 0; padding: 4px 8px; font-size: 12px; background: transparent; text-align: left; }
+.softkeys button:last-child { text-align: right; }
+.softkeys .soft-center { text-align: center; font-weight: bold; color: #f4cb7b; }
+.watch-view { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; background: #0e1816; color: #fff; }
+.watch-view h1 { font-size: 18px; }
+.player-container { flex: 1 0 200px; min-width: 200px; min-height: 200px; width: 100%; display: grid; place-items: center; background: #000; }
+.player-container iframe { display: block; width: 100%; height: 100%; min-height: 200px; border: 0; }
+.watch-info { padding: 5px 8px; flex: 0 0 auto; font-size: 11px; line-height: 1.25; }
+#status { margin: 0; }
+.text-button { border: 0; background: transparent; color: #f4cb7b; text-decoration: underline; padding: 4px 0 0; font-size: 12px; }
+.watch-view.compact .player-container { display: none; }
+.watch-view.compact .watch-info { margin: auto 0; font-size: 13px; }
+.panel { position: absolute; inset: 40px 0 28px; background: var(--paper); z-index: 2; display: flex; flex-direction: column; }
+.panel h2 { padding: 8px 10px; margin: 0; color: var(--red); font-size: 16px; border-bottom: 1px solid #d8dcd1; }
+.panel-content { overflow-y: auto; padding: 6px; min-height: 0; }
+.panel-item { display: block; width: 100%; border: 0; padding: 10px 8px; background: transparent; text-align: left; font-size: 14px; }
+.panel-item:focus { background: var(--green); color: #fff; outline: none; }
+.help-text { font-size: 13px; line-height: 1.5; padding: 0 4px; }
+.help-text p { margin: 0 0 8px; }
+.help-text strong { color: var(--red); }
+@media (min-width: 500px) {
+  body { display: grid; place-items: center; }
+  #app { width: 360px; height: min(640px, 100dvh); box-shadow: 0 12px 60px #132d2926; }
+  .channel { min-height: 49px; }
+  .masthead { flex-basis: 48px; }
+  .panel { top: 48px; }
+}
+@media (max-width: 180px) {
+  .masthead { flex-basis: 27px; padding: 0 5px; gap: 4px; }
+  h1 { font-size: 14px; }
+  .brand-mark, .edition { display: none; }
+  .section-label { padding: 4px; font-size: 9px; }
+  .channel-list { padding: 2px; }
+  .channel { min-height: 30px; padding: 4px; gap: 5px; }
+  .channel-number { width: 18px; height: 20px; flex-basis: 18px; font-size: 10px; }
+  .channel-name { font-size: 12px; }
+  .channel-arrow { display: none; }
+  .list-hint { font-size: 9px; padding: 3px; }
+  .softkeys { flex-basis: 24px; }
+  .softkeys button { font-size: 10px; padding: 4px; }
+  .panel { inset: 27px 0 24px; }
+  .panel h2 { padding: 4px; font-size: 13px; }
+  .panel-item { padding: 7px 4px; font-size: 12px; }
+  .help-text { font-size: 11px; }
+}
