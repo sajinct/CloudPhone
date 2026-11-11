@@ -17,15 +17,20 @@ The app fetches [IPTV-org's Malayalam playlist](https://iptv-org.github.io/iptv/
 | ← / → | Previous / next channel in the selected category |
 | 1–9 | Watch the first nine channels in the current list |
 | # | Add / remove current channel from Favorites |
-| 0 | Show system volume controls while watching |
+| 0 | Enable media sound and show system volume controls (raise one step on phones without a volume-menu API) |
+| * | Toggle full screen while watching; desktop keyboards can also use F |
 | Left soft key / Escape | Options, categories, favorites, refresh and help |
-| Right soft key | Close menu; return from player; exit at the channel list |
+| Right soft key | Close menu; exit full screen; return from player; exit at the channel list |
 
 The last selected channel and favorites are saved locally when browser storage is available. Menus pause active playback. Returning to channels stops the stream and releases its player.
 
+**Sound:** choose **Enable sound** below the video or in Options. This explicitly unmutes the media, enables a native audio track when available (preferring Malayalam), and raises Cloud Phone system volume one step. Use ↑ / ↓ for further adjustment. Playback also clears media mute when starting or resuming. These controls address mute and volume states; codec and device-specific audio behavior still require checking on the actual Nokia.
+
+**Full screen:** choose the button below the video, **Options → Full screen**, or press **\***. Header, footer and channel details are hidden so the video fills the screen without cropping. On Cloud Phone the inline opt-out is also removed, allowing its native fullscreen video player. No unsupported browser Fullscreen API is required. Press the right soft key or * to leave fullscreen before returning to channels; on desktop, the onscreen Back button is also available.
+
 ## Playback
 
-Cloud Phone uses native HLS and `navigator.volumeManager`, without downloading HLS.js. The video uses `x-puffin-playsinline` to preserve the app's keypad controls. Safari and HLS-capable browsers without MediaSource also use native playback; compatible desktop Chromium browsers load the locally vendored **HLS.js 1.7.4** player on demand. The desktop player starts at the lowest quality, caps adaptive quality to the display, and selects a Malayalam audio track when one is identified. Native playback's audio selection is controlled by the platform.
+Cloud Phone uses native HLS and `navigator.volumeManager`, without downloading HLS.js. The normal view uses `x-puffin-playsinline`; fullscreen mode removes it. Safari and HLS-capable browsers without MediaSource also use native playback; compatible desktop Chromium browsers load the locally vendored **HLS.js 1.7.4** player on demand. The desktop player starts at the lowest quality, caps adaptive quality to the display, and selects a Malayalam audio track when one is identified. Native playback selects a Malayalam track when `audioTracks` is exposed; otherwise the platform chooses its audio track.
 
 Stream availability and region restrictions come from the broadcaster. Some entries are not broadcasting 24/7. HTTP-only streams cannot play in an HTTPS page; DASH and DRM-protected entries are unsupported and show an explanation. Per-stream user-agent/referrer directives in M3U/VLC metadata cannot be applied by a static browser app. Native playback and desktop playback may differ because of codecs, CORS, redirects, nested HTTP URLs, and broadcaster restrictions. The app does not proxy streams or bypass these requirements. Test actual playback and volume on the Nokia before catalog submission.
 

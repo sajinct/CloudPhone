@@ -29,12 +29,17 @@
         <div class="now-label">NOW PLAYING <span id="watch-position"></span></div>
         <h2 id="watch-title"></h2>
         <p id="player-status" role="status" aria-live="polite">Connecting…</p>
+        <div class="watch-actions">
+          <button id="sound-on" class="watch-action">Enable sound</button>
+          <button id="fullscreen-on" class="watch-action">Full screen *</button>
+        </div>
       </div>
     </section>
     <section id="panel" class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
       <h2 id="panel-title">Options</h2>
       <div id="panel-content" class="panel-content"></div>
     </section>
+    <button id="fullscreen-back" class="fullscreen-back" hidden>Back · exit full screen</button>
     <footer class="softkeys" aria-label="Phone soft keys">
       <button id="soft-left" aria-label="Options (left soft key or Escape)">Options</button>
       <button id="soft-center">Wait</button>

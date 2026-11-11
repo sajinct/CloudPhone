@@ -1,4 +1,5 @@
 import { loadPlaylist, playbackIssue, playbackMode } from './playlist.js';
+import { unmuteVideo, enableNativeAudio, systemVolume } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 const browse = $('browse');
@@ -20,6 +21,7 @@ let hls;
 let hlsPromise;
 let generation = 0;
 let state = 'loading';
+let fullscreen = false;
 let watchdog;
 let refreshController;
 let refreshGeneration = 0;
@@ -168,6 +170,8 @@ function fail(message) {
 async function play(token = generation) {
   const current = video;
   if (!current) return;
+  unmuteVideo(current);
+  enableNativeAudio(current);
   timeoutPlayback(token);
   try { await current.play(); }
   catch (error) {
@@ -211,19 +215,24 @@ async function tune(index) {
   const token = generation;
   const current = document.createElement('video');
   current.controls = true;
-  current.playsInline = true;
-  current.setAttribute('x-puffin-playsinline', '');
+  configureVideoDisplay(current);
+  unmuteVideo(current);
   current.preload = 'none';
   current.tabIndex = -1;
   current.setAttribute('aria-label', channel.name);
   video = current;
   $('video-stage').append(current);
   const active = () => token === generation && watching;
+  current.addEventListener('loadedmetadata', () => {
+    if (active()) { unmuteVideo(current); enableNativeAudio(current); }
+  });
+  current.audioTracks?.addEventListener?.('addtrack', () => { if (active()) enableNativeAudio(current); });
   current.addEventListener('playing', () => {
     if (!active()) return;
     clearTimeout(watchdog);
     if (panelKind) { resumeAfterPanel = true; current.pause(); return; }
-    playerStatus('← → channel · ↑ ↓ volume', 'playing');
+    enableNativeAudio(current);
+    playerStatus('← → channel · ↑ ↓ volume · * full screen', 'playing');
   });
   current.addEventListener('pause', () => {
     if (active() && state !== 'error') { clearTimeout(watchdog); playerStatus('Paused · press OK to play', 'paused'); }
@@ -270,6 +279,7 @@ function togglePlayback() {
 
 function goToChannels() {
   closePanel(false);
+  setFullscreen(false, false);
   stopPlayer();
   watching = false;
   watch.hidden = true;
@@ -279,14 +289,53 @@ function goToChannels() {
 }
 
 function changeVolume(direction) {
-  const method = direction > 0 ? 'requestUp' : direction < 0 ? 'requestDown' : 'requestShow';
-  if (typeof navigator.volumeManager?.[method] === 'function') { navigator.volumeManager[method](); return; }
+  if (direction >= 0) { unmuteVideo(video); enableNativeAudio(video); }
+  if (systemVolume(navigator.volumeManager, direction)) return;
   if (!video) return;
   if (direction) {
     video.volume = Math.min(1, Math.max(0, Math.round((video.volume + direction * 0.1) * 10) / 10));
     if (video.volume) video.muted = false;
     $('player-status').textContent = `Volume ${Math.round(video.volume * 100)}% · ↑ ↓ to adjust`;
   } else $('player-status').textContent = 'Press ↑ ↓ to adjust volume.';
+}
+
+function soundOn() {
+  if (!video) return;
+  closePanel(false);
+  unmuteVideo(video);
+  enableNativeAudio(video);
+  // This explicit action also brings a phone at system volume zero up one step.
+  systemVolume(navigator.volumeManager, 1);
+  if (video.paused && state !== 'error') play();
+  $('player-status').textContent = 'Sound enabled · press ↑ to raise phone volume';
+}
+
+function configureVideoDisplay(current) {
+  const phoneFullscreen = fullscreen && /Cloud Phone/i.test(navigator.userAgent);
+  current.playsInline = !phoneFullscreen;
+  current.toggleAttribute('x-puffin-playsinline', !phoneFullscreen);
+}
+
+function setFullscreen(enabled, resume = true) {
+  fullscreen = Boolean(enabled && watching);
+  $('app').classList.toggle('fullscreen', fullscreen);
+  $('fullscreen-back').hidden = !fullscreen;
+  if (!video) return;
+  const phone = /Cloud Phone/i.test(navigator.userAgent);
+  const wasPlaying = !video.paused || resumeAfterPanel;
+  // Cloud Phone does not support the browser Fullscreen API. Removing its
+  // inline opt-out lets the phone use its native fullscreen video display.
+  if (phone && wasPlaying) video.pause();
+  configureVideoDisplay(video);
+  if (phone && resume && wasPlaying) play();
+  if (fullscreen) video.focus({ preventScroll: true });
+  else center.focus();
+}
+
+function toggleFullscreen() {
+  if (!watching || !video) return;
+  closePanel();
+  setFullscreen(!fullscreen);
 }
 
 function toggleFavorite() {
@@ -319,7 +368,7 @@ function showPanel(kind) {
     const help = document.createElement('div');
     help.className = 'help';
     help.tabIndex = 0;
-    help.innerHTML = '<p><b>Choose a channel</b><br>↑ ↓ browse · OK watch<br>1–9: first nine in this list<br>#: add / remove favorite</p><p><b>While watching</b><br>OK play / pause · ← → channel<br>↑ ↓ volume · 0 volume menu<br>Right soft key: all channels</p><p>Left soft key (Escape): options. Filter by category or Favorites. Refresh playlist to get the latest entries.</p><p>Streams come from <a href="https://iptv-org.github.io/iptv/languages/mal.m3u">IPTV-org</a>. Availability depends on the broadcaster and your region. HTTP-only and DASH entries cannot play in this app. Some channels require headers a browser cannot supply.</p>';
+    help.innerHTML = '<p><b>Choose a channel</b><br>↑ ↓ browse · OK watch<br>1–9: first nine in this list<br>#: add / remove favorite</p><p><b>While watching</b><br>OK play / pause · ← → channel<br>↑ ↓ volume · 0 sound / volume<br>*: full screen on / off<br>Back: exit full screen, then channels</p><p><b>No sound?</b><br>Choose Enable sound, then press ↑ to raise phone volume. Full screen uses the phone video player.</p><p>Left soft key (Escape): options. Filter by category or Favorites. Refresh playlist to get the latest entries.</p><p>Streams come from <a href="https://iptv-org.github.io/iptv/languages/mal.m3u">IPTV-org</a>. Availability depends on the broadcaster and your region. HTTP-only and DASH entries cannot play in this app. Some channels require headers a browser cannot supply.</p>';
     content.append(help);
     help.focus();
   } else {
@@ -328,7 +377,12 @@ function showPanel(kind) {
       ['Favorites', () => chooseCategory('Favorites')],
       ...[...new Set(channels.flatMap((channel) => channel.groups))].sort().map((group) => [group, () => chooseCategory(group)])
     ] : [
-      ...(watching ? [['Volume', () => { closePanel(); changeVolume(0); }], ['Retry stream', () => tune(selected)]] : []),
+      ...(watching ? [
+        [fullscreen ? 'Exit full screen' : 'Full screen', toggleFullscreen],
+        ['Enable sound', soundOn],
+        ['Volume', () => { closePanel(); changeVolume(0); }],
+        ['Retry stream', () => tune(selected)]
+      ] : []),
       ['Categories', () => showPanel('categories')],
       ['Favorites', () => chooseCategory('Favorites')],
       ...(visible.length ? [[favorites.has(visible[selected].key) ? 'Remove favorite' : 'Add favorite', () => { closePanel(); toggleFavorite(); }]] : []),
@@ -365,6 +419,7 @@ function closePanel(resume = true) {
 
 function back() {
   if (panelKind) { closePanel(); return true; }
+  if (fullscreen) { setFullscreen(false); return true; }
   if (watching) { goToChannels(); return true; }
   return false;
 }
@@ -388,6 +443,9 @@ function movePanel(direction) {
 $('soft-left').addEventListener('click', () => panelKind ? closePanel() : showPanel('options'));
 center.addEventListener('click', primary);
 $('soft-right').addEventListener('click', () => { if (!back()) window.close(); });
+$('sound-on').addEventListener('click', soundOn);
+$('fullscreen-on').addEventListener('click', toggleFullscreen);
+$('fullscreen-back').addEventListener('click', () => setFullscreen(false));
 window.addEventListener('back', (event) => { if (back()) event.preventDefault(); });
 window.addEventListener('pagehide', stopPlayer);
 window.addEventListener('pageshow', (event) => { if (event.persisted) goToChannels(); });
@@ -405,7 +463,7 @@ document.addEventListener('keydown', (event) => {
     if (document.activeElement?.matches('a')) return;
     event.preventDefault();
     if (!event.repeat) {
-      if (document.activeElement?.matches('#soft-left, #soft-right')) document.activeElement.click();
+      if (document.activeElement?.matches('#soft-left, #soft-right, .watch-action, .fullscreen-back')) document.activeElement.click();
       else primary();
     }
   } else if (panelKind) {
@@ -414,6 +472,9 @@ document.addEventListener('keydown', (event) => {
       if (panelKind === 'help') content.scrollBy(0, key === 'ArrowUp' ? -35 : 35);
       else movePanel(key === 'ArrowUp' ? -1 : 1);
     } else if (key === 'Tab' && panelKind !== 'help') { event.preventDefault(); movePanel(event.shiftKey ? -1 : 1); }
+  } else if (watching && (key === '*' || key.toLowerCase() === 'f')) {
+    event.preventDefault();
+    if (!event.repeat) toggleFullscreen();
   } else if (/^[1-9]$/.test(key)) {
     event.preventDefault();
     if (!event.repeat && Number(key) <= visible.length) tune(Number(key) - 1);

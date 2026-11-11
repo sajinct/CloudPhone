@@ -63,6 +63,7 @@ try {
   await key('Enter');
   await until('document.getElementById("soft-center").textContent === "Pause"');
   assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), true);
+  assert.equal(await evaluate('document.querySelector("video").muted'), false);
   assert.equal(await evaluate('document.querySelector("script[src*=hls]")'), null, 'Native playback never loads HLS.js');
   await key('Enter');
   assert.equal(await evaluate('document.getElementById("soft-center").textContent'), 'Play');
@@ -81,6 +82,28 @@ try {
   await key('ArrowDown');
   await key('0');
   assert.deepEqual(await evaluate('__volume'), ['down', 'show']);
+  await evaluate('document.querySelector("video").muted = true; document.querySelector("video").volume = 0;');
+  await evaluate('document.getElementById("sound-on").click()');
+  assert.equal(await evaluate('document.querySelector("video").muted'), false, 'Enable sound unmutes the phone video');
+  assert.equal(await evaluate('document.querySelector("video").volume'), 1);
+  assert.equal(await evaluate('__volume.at(-1)'), 'up', 'Enable sound raises phone system volume');
+  await key('*');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true);
+  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false, 'Phone fullscreen opts into native video display');
+  assert.equal(await evaluate('document.querySelector("video").playsInline'), false);
+  assert.equal(await evaluate('document.querySelector("video").paused'), false);
+  assert.equal(await evaluate('document.querySelector("video").getBoundingClientRect().height'), 320);
+  await screenshot('malayalam-tv-fullscreen-240x320.png');
+  assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
+  assert.equal(await evaluate('document.getElementById("watch").hidden'), false, 'First Back only exits fullscreen');
+  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), true);
+  await key('Escape');
+  assert.equal(await evaluate('document.activeElement.textContent'), 'Full screen');
+  await key('Enter');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true, 'Menu offers fullscreen');
+  await key('*');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
   await key('Escape');
   assert.equal(await evaluate('document.querySelector("video").paused'), true);
   await key('Escape');
@@ -165,5 +188,5 @@ try {
   await key('Backspace');
   assert.equal(await evaluate('__hls.dead'), true);
   assert.equal(session.exceptions.length, 0, JSON.stringify(session.exceptions));
-  console.log('Malayalam TV browser checks passed: native/HLS playback lifecycle, categories, favorites, volume, errors, autoplay, cache fallback, and five screen sizes.');
+  console.log('Malayalam TV browser checks passed: native/HLS playback, sound recovery, fullscreen, categories, favorites, volume, errors, autoplay, cache fallback, and five screen sizes.');
 } finally { await session.close(); }
