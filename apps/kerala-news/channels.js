@@ -4,7 +4,7 @@ export const CHANNELS = Object.freeze([
   { id: "1wECsnGZcfc", name: "24" },
   { id: "0QMlfUjUVzk", name: "Asianet News" },
   { id: "nObUcHKZEGY", name: "Reporter" },
-  { id: "Az5I714Nk4M", name: "Big TV" },
+  { id: "vnFyrDE20G8", name: "Big TV" },
   { id: "tgBTspqA5nY", name: "Manorama" },
   { id: "RbxEftGN584", name: "Mathrubhumi" },
   { id: "T9Ol2JHqKlM", name: "Janam" },
