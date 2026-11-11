@@ -62,7 +62,8 @@ try {
   assert.equal(await evaluate('document.querySelectorAll(".channel").length'), 2);
   await key('Enter');
   await until('document.getElementById("soft-center").textContent === "Pause"');
-  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), true);
+  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false);
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true, 'Phone starts in its audible native fullscreen player');
   assert.equal(await evaluate('document.querySelector("video").muted'), false);
   assert.equal(await evaluate('document.querySelector("script[src*=hls]")'), null, 'Native playback never loads HLS.js');
   await key('Enter');
@@ -88,6 +89,10 @@ try {
   assert.equal(await evaluate('document.querySelector("video").volume'), 1);
   assert.equal(await evaluate('__volume.at(-1)'), 'up', 'Enable sound raises phone system volume');
   await key('*');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
+  assert.equal(await evaluate('document.querySelector("video").paused'), true, 'Leaving fullscreen on the phone pauses playback');
+  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false, 'Phone must never opt into silent inline playback');
+  await key('*');
   assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true);
   assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false, 'Phone fullscreen opts into native video display');
   assert.equal(await evaluate('document.querySelector("video").playsInline'), false);
@@ -97,7 +102,8 @@ try {
   assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
   assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
   assert.equal(await evaluate('document.getElementById("watch").hidden'), false, 'First Back only exits fullscreen');
-  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), true);
+  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false);
+  assert.equal(await evaluate('document.querySelector("video").paused'), true);
   await key('Escape');
   assert.equal(await evaluate('document.activeElement.textContent'), 'Full screen');
   await key('Enter');
@@ -106,6 +112,11 @@ try {
   assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
   await key('Escape');
   assert.equal(await evaluate('document.querySelector("video").paused'), true);
+  await key('Escape');
+  assert.equal(await evaluate('document.querySelector("video").paused'), true, 'Closing a menu preserves the paused app view');
+  await key('Enter');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true);
+  await key('Escape');
   await key('Escape');
   assert.equal(await evaluate('document.querySelector("video").paused'), false);
 
@@ -119,6 +130,8 @@ try {
   await key('Enter');
   await until('document.getElementById("soft-center").textContent === "Pause"');
 
+  assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
+  assert.equal(await evaluate('document.querySelector("video").paused'), true, 'Back from native playback returns a paused view');
   assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
   assert.equal(await evaluate('document.querySelectorAll("video").length'), 0);
   assert.equal(await evaluate('window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
@@ -167,6 +180,7 @@ try {
     await until('document.getElementById("soft-center").textContent === "Pause"');
     if (width === 240 && height === 320) await screenshot('malayalam-tv-player-240x320.png');
     await key('Backspace');
+    await key('Backspace');
   }
 
   // Use a mock MSE player to verify the desktop branch and cleanup independently.
@@ -182,6 +196,8 @@ try {
   }`);
   await key('1');
   await until('Boolean(window.__hls?.url)');
+  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), true, 'Desktop playback stays embedded');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
   assert.equal(await evaluate('__hls.audioTrack'), 1, 'Malayalam audio is selected');
   await evaluate('__hls.callbacks.error(null, {fatal:true})');
   assert.equal(await evaluate('document.getElementById("soft-center").textContent'), 'Retry');

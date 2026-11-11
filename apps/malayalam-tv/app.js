@@ -8,6 +8,7 @@ const list = $('channel-list');
 const panel = $('panel');
 const content = $('panel-content');
 const center = $('soft-center');
+const isCloudPhone = () => /Cloud Phone/i.test(navigator.userAgent);
 let channels = [];
 let visible = [];
 let selected = 0;
@@ -162,6 +163,7 @@ function timeoutPlayback(token) {
 
 function fail(message) {
   clearTimeout(watchdog);
+  if (isCloudPhone() && fullscreen) setFullscreen(false, false);
   playerStatus(message, 'error');
   hls?.stopLoad();
   video?.pause();
@@ -170,6 +172,7 @@ function fail(message) {
 async function play(token = generation) {
   const current = video;
   if (!current) return;
+  if (isCloudPhone() && !fullscreen) setFullscreen(true, false);
   unmuteVideo(current);
   enableNativeAudio(current);
   timeoutPlayback(token);
@@ -177,7 +180,10 @@ async function play(token = generation) {
   catch (error) {
     if (token !== generation) return;
     clearTimeout(watchdog);
-    if (error.name === 'NotAllowedError') playerStatus('Press OK to start playback.', 'blocked');
+    if (error.name === 'NotAllowedError') {
+      if (isCloudPhone()) setFullscreen(false, false);
+      playerStatus('Press OK to start playback.', 'blocked');
+    }
     else if (error.name !== 'AbortError') fail('Cannot play this stream. It may be offline, restricted, or incompatible. Try another channel.');
   }
 }
@@ -231,6 +237,7 @@ async function tune(index) {
     if (!active()) return;
     clearTimeout(watchdog);
     if (panelKind) { resumeAfterPanel = true; current.pause(); return; }
+    if (isCloudPhone() && !fullscreen) setFullscreen(true, false);
     enableNativeAudio(current);
     playerStatus('← → channel · ↑ ↓ volume · * full screen', 'playing');
   });
@@ -311,9 +318,10 @@ function soundOn() {
 }
 
 function configureVideoDisplay(current) {
-  const phoneFullscreen = fullscreen && /Cloud Phone/i.test(navigator.userAgent);
-  current.playsInline = !phoneFullscreen;
-  current.toggleAttribute('x-puffin-playsinline', !phoneFullscreen);
+  // The Nokia's inline video path renders video without audio. Always let
+  // Cloud Phone open its native video player; desktop keeps inline playback.
+  current.playsInline = !isCloudPhone();
+  current.toggleAttribute('x-puffin-playsinline', !isCloudPhone());
 }
 
 function setFullscreen(enabled, resume = true) {
@@ -321,13 +329,15 @@ function setFullscreen(enabled, resume = true) {
   $('app').classList.toggle('fullscreen', fullscreen);
   $('fullscreen-back').hidden = !fullscreen;
   if (!video) return;
-  const phone = /Cloud Phone/i.test(navigator.userAgent);
+  const phone = isCloudPhone();
   const wasPlaying = !video.paused || resumeAfterPanel;
-  // Cloud Phone does not support the browser Fullscreen API. Removing its
-  // inline opt-out lets the phone use its native fullscreen video display.
-  if (phone && wasPlaying) video.pause();
   configureVideoDisplay(video);
-  if (phone && resume && wasPlaying) play();
+  if (phone && !fullscreen) {
+    // Returning to the app pauses the native player rather than resuming the
+    // phone's silent embedded view. OK opens playback with sound again.
+    video.pause();
+    if (state !== 'error') playerStatus('Press OK to watch with sound in full screen.', 'paused');
+  } else if (phone && resume && wasPlaying && video.paused) play();
   if (fullscreen) video.focus({ preventScroll: true });
   else center.focus();
 }
@@ -336,6 +346,7 @@ function toggleFullscreen() {
   if (!watching || !video) return;
   closePanel();
   setFullscreen(!fullscreen);
+  if (isCloudPhone() && fullscreen && video.paused && state !== 'error') play();
 }
 
 function toggleFavorite() {
@@ -368,7 +379,7 @@ function showPanel(kind) {
     const help = document.createElement('div');
     help.className = 'help';
     help.tabIndex = 0;
-    help.innerHTML = '<p><b>Choose a channel</b><br>↑ ↓ browse · OK watch<br>1–9: first nine in this list<br>#: add / remove favorite</p><p><b>While watching</b><br>OK play / pause · ← → channel<br>↑ ↓ volume · 0 sound / volume<br>*: full screen on / off<br>Back: exit full screen, then channels</p><p><b>No sound?</b><br>Choose Enable sound, then press ↑ to raise phone volume. Full screen uses the phone video player.</p><p>Left soft key (Escape): options. Filter by category or Favorites. Refresh playlist to get the latest entries.</p><p>Streams come from <a href="https://iptv-org.github.io/iptv/languages/mal.m3u">IPTV-org</a>. Availability depends on the broadcaster and your region. HTTP-only and DASH entries cannot play in this app. Some channels require headers a browser cannot supply.</p>';
+    help.innerHTML = '<p><b>Choose a channel</b><br>↑ ↓ browse · OK watch<br>1–9: first nine in this list<br>#: add / remove favorite</p><p><b>While watching</b><br>OK play / pause · ← → channel<br>↑ ↓ volume · 0 sound / volume<br>*: full screen on / off<br>Back: exit full screen, then channels</p><p><b>Sound on CloudPhone</b><br>Channels open in the phone player for sound. Leaving full screen pauses playback. Press OK to watch again. Use ↑ to raise phone volume.</p><p>Left soft key (Escape): options. Filter by category or Favorites. Refresh playlist to get the latest entries.</p><p>Streams come from <a href="https://iptv-org.github.io/iptv/languages/mal.m3u">IPTV-org</a>. Availability depends on the broadcaster and your region. HTTP-only and DASH entries cannot play in this app. Some channels require headers a browser cannot supply.</p>';
     content.append(help);
     help.focus();
   } else {
