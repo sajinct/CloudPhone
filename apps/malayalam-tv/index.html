@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#182c48">
+  <meta name="description" content="Malayalam live TV from the IPTV-org playlist, made for CloudPhone and keypad navigation.">
+  <title>Malayalam TV</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main id="app">
+    <header class="masthead">
+      <span class="tv-mark" aria-hidden="true">▶</span>
+      <h1>Malayalam TV</h1>
+      <span class="live-badge">LIVE</span>
+    </header>
+    <section id="browse" class="browse" aria-label="TV channels">
+      <div class="section-label"><span id="category-label">All channels</span><span id="channel-count">…</span></div>
+      <div id="channel-list" class="channel-list" role="group" aria-label="Choose a channel"></div>
+      <div id="list-message" class="list-message" role="status">Loading channels…</div>
+      <div class="list-footnote"><span id="playlist-status" role="status">IPTV-org Malayalam</span><span>★ #</span></div>
+    </section>
+    <section id="watch" class="watch" aria-label="Watch TV" hidden>
+      <div id="video-stage" class="video-stage"></div>
+      <div class="now-playing">
+        <div class="now-label">NOW PLAYING <span id="watch-position"></span></div>
+        <h2 id="watch-title"></h2>
+        <p id="player-status" role="status" aria-live="polite">Connecting…</p>
+      </div>
+    </section>
+    <section id="panel" class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title" hidden>
+      <h2 id="panel-title">Options</h2>
+      <div id="panel-content" class="panel-content"></div>
+    </section>
+    <footer class="softkeys" aria-label="Phone soft keys">
+      <button id="soft-left" aria-label="Options (left soft key or Escape)">Options</button>
+      <button id="soft-center">Wait</button>
+      <button id="soft-right">Exit</button>
+    </footer>
+  </main>
+  <noscript>Enable JavaScript to load and watch Malayalam TV.</noscript>
+</body>
+</html>

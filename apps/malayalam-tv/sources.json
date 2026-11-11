@@ -1,0 +1,30 @@
+{
+  "retrievedAt": "2026-11-11T07:31:01.276Z",
+  "hlsVersion": "1.7.4",
+  "files": [
+    {
+      "file": "playlist.m3u",
+      "source": "https://iptv-org.github.io/iptv/languages/mal.m3u",
+      "sha256": "120024dcedead88fefc78fadb130ef7b84a042886dd4a217764b4d5c5375b8c9",
+      "bytes": 16151
+    },
+    {
+      "file": "vendor/hls.min.js",
+      "source": "https://cdn.jsdelivr.net/npm/hls.js@1.7.4/dist/hls.min.js",
+      "sha256": "cfc70cc9e9fc63d071919e087670abc760c8fd1bc889b88588026e4d22193bbe",
+      "bytes": 623915
+    },
+    {
+      "file": "vendor/HLS-LICENSE",
+      "source": "https://cdn.jsdelivr.net/npm/hls.js@1.7.4/LICENSE",
+      "sha256": "ca8773cf798c7ed997d4dd7c8e23c348699f8d5b7462636694cc14de6cda12db",
+      "bytes": 1338
+    },
+    {
+      "file": "IPTV-LICENSE",
+      "source": "https://raw.githubusercontent.com/iptv-org/iptv/master/LICENSE",
+      "sha256": "640514163b17f977adc997cb16f51871122cfb0555ebad1a3f01e167b7ba8857",
+      "bytes": 1235
+    }
+  ]
+}

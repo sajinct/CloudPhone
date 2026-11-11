@@ -6,8 +6,10 @@
   "description": "Custom Cloud Phone widgets for the Nokia 3210",
   "scripts": {
     "start": "node scripts/serve.mjs",
+    "build": "node scripts/build-pages.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:browser": "node tests/browser.mjs"
+    "test:browser": "node tests/browser.mjs",
+    "test:tv": "node tests/tv-browser.mjs"
   },
   "engines": { "node": ">=22" }
 }

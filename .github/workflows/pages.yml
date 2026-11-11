@@ -1,4 +1,4 @@
-name: Deploy Kerala News to GitHub Pages
+name: Deploy CloudPhone apps to GitHub Pages
 
 on:
   push:
@@ -31,12 +31,14 @@ jobs:
           node-version: '22'
       - name: Test channel configuration
         run: npm test
+      - name: Prepare both apps
+        run: npm run build
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload Kerala News
+      - name: Upload CloudPhone apps
         uses: actions/upload-pages-artifact@v4
         with:
-          path: apps/kerala-news
+          path: artifacts/pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

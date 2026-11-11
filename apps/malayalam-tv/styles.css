@@ -1,0 +1,77 @@
+:root { font-family: Arial, Roboto, sans-serif; color: #182c48; background: #e5e9f0; color-scheme: light; --navy: #182c48; --gold: #f5c75a; --paper: #f6f8fc; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid #c77412; outline-offset: -2px; }
+[hidden] { display: none !important; }
+#app { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; height: 100dvh; background: var(--paper); overflow: hidden; }
+.masthead { display: flex; align-items: center; gap: 7px; padding: 0 8px; flex: 0 0 40px; border-bottom: 3px solid var(--gold); background: var(--navy); color: white; }
+.masthead h1 { margin: 0; flex: 1; font-size: 19px; white-space: nowrap; }
+.tv-mark { display: grid; place-items: center; width: 19px; height: 16px; border: 1.5px solid var(--gold); border-radius: 3px; font-size: 9px; color: var(--gold); }
+.live-badge { font-size: 9px; font-weight: bold; color: var(--gold); letter-spacing: 1px; }
+.browse { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.section-label { display: flex; justify-content: space-between; gap: 5px; padding: 7px 8px; font-size: 11px; border-bottom: 1px solid #dbe1e9; color: #4a607b; }
+#channel-count { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.channel-list { min-height: 0; overflow-y: auto; flex: 1; padding: 3px 5px; scrollbar-width: thin; scrollbar-color: #8b99af transparent; }
+.channel { display: flex; align-items: center; gap: 7px; width: 100%; min-height: 46px; padding: 6px; text-align: left; border: 0; border-bottom: 1px solid #e0e5ed; border-radius: 3px; background: transparent; }
+.channel-number { display: grid; place-items: center; width: 25px; height: 25px; flex: 0 0 25px; border-radius: 4px; background: #e5eaf2; font: bold 12px monospace; }
+.channel-copy { min-width: 0; flex: 1; }
+.channel-name { display: block; font-size: 15px; font-weight: bold; overflow-wrap: anywhere; }
+.channel-meta { display: block; margin-top: 3px; font-size: 10px; line-height: 1.2; color: #5b6c82; }
+.channel-star { width: 11px; font-size: 12px; color: #925b0c; }
+.channel.selected { background: var(--navy); color: white; outline: none; border-color: var(--navy); }
+.channel.selected .channel-number { background: var(--gold); color: var(--navy); }
+.channel.selected .channel-meta { color: #cad6e6; }
+.channel.selected .channel-star { color: var(--gold); }
+.list-message { flex: 1; padding: 18px 10px; font-size: 14px; line-height: 1.5; }
+.list-footnote { display: flex; justify-content: space-between; gap: 4px; padding: 5px 8px; font-size: 9px; line-height: 1.3; border-top: 1px solid #dbe1e9; color: #526780; }
+.list-footnote span:last-child { white-space: nowrap; }
+.softkeys { z-index: 3; display: flex; flex: 0 0 28px; background: var(--navy); color: white; border-top: 1px solid #405575; }
+.softkeys button { flex: 1; min-width: 0; background: transparent; border: 0; font-size: 12px; padding: 4px 7px; text-align: left; }
+.softkeys button:last-child { text-align: right; }
+#soft-center { text-align: center; font-weight: bold; color: var(--gold); }
+.watch { display: flex; flex-direction: column; flex: 1; min-height: 0; background: #080e18; color: #fff; }
+.video-stage { display: flex; flex: 1; align-items: center; justify-content: center; min-height: 0; background: black; }
+.video-stage video { display: block; width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
+.now-playing { padding: 7px 8px; flex: 0 0 auto; max-height: 45%; overflow-y: auto; border-top: 1px solid #27344a; }
+.now-label { display: flex; justify-content: space-between; font-size: 8px; letter-spacing: 1px; color: var(--gold); }
+.now-playing h2 { margin: 4px 0; font-size: 15px; overflow-wrap: anywhere; }
+#player-status { margin: 0; font-size: 11px; line-height: 1.4; color: #d2ddeb; }
+.panel { position: absolute; inset: 40px 0 28px; z-index: 2; display: flex; flex-direction: column; background: var(--paper); }
+.panel h2 { margin: 0; padding: 8px; border-bottom: 1px solid #dbe1e9; font-size: 16px; }
+.panel-content { min-height: 0; overflow-y: auto; padding: 5px; }
+.panel-item { display: block; width: 100%; padding: 10px 7px; border: 0; background: transparent; text-align: left; font-size: 14px; }
+.panel-item:focus { outline: none; background: var(--navy); color: white; }
+.help { padding: 3px; font-size: 12px; line-height: 1.5; }
+.help p { margin: 0 0 10px; }
+.help a { color: #174a8e; }
+@media (min-width: 500px) {
+  body { display: grid; place-items: center; }
+  #app { width: 360px; height: min(640px, 100dvh); box-shadow: 0 12px 60px #182c4826; }
+  .channel { min-height: 52px; }
+  .masthead { flex-basis: 48px; }
+  .panel { top: 48px; }
+}
+@media (max-width: 180px) {
+  .masthead { flex-basis: 27px; gap: 4px; padding: 0 5px; }
+  .masthead h1 { font-size: 14px; }
+  .tv-mark, .live-badge { display: none; }
+  .section-label { padding: 4px; font-size: 9px; }
+  .channel-list { padding: 2px; }
+  .channel { min-height: 36px; padding: 4px; gap: 4px; }
+  .channel-number { width: 18px; height: 20px; flex-basis: 18px; font-size: 9px; }
+  .channel-name { font-size: 12px; }
+  .channel-meta { font-size: 8px; margin-top: 2px; }
+  .list-footnote { padding: 3px 4px; font-size: 8px; }
+  .list-footnote span:last-child { display: none; }
+  .softkeys { flex-basis: 24px; }
+  .softkeys button { font-size: 10px; padding: 4px; }
+  .panel { inset: 27px 0 24px; }
+  .panel h2 { font-size: 13px; padding: 5px; }
+  .panel-item { padding: 7px 4px; font-size: 12px; }
+  .help { font-size: 11px; }
+  .now-playing { padding: 4px; }
+  .now-playing h2 { font-size: 11px; }
+  .now-label { font-size: 7px; }
+  #player-status { font-size: 9px; }
+}

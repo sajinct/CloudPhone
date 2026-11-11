@@ -4,10 +4,11 @@ Custom web widgets for CloudMosa Cloud Phone on the Nokia 3210. The first app is
 
 - **App:** [Kerala News](https://sajinct.github.io/CloudPhone/)
 - **Source:** [sajinct/CloudPhone](https://github.com/sajinct/CloudPhone)
+- **Separate TV app:** [Malayalam TV](https://sajinct.github.io/CloudPhone/malayalam-tv/) — IPTV-org live channels, categories and favorites; see [its setup guide](apps/malayalam-tv/README.md).
 
 ## GitHub Pages deployment
 
-The `.github/workflows/pages.yml` workflow runs the channel tests and publishes only `apps/kerala-news/` on every push to `main`. Repository scripts, tests, and local browser profiles are not part of the hosted site. GitHub Pages must be configured to use **GitHub Actions** as its publishing source.
+The `.github/workflows/pages.yml` workflow runs the tests, prepares both apps with `npm run build`, and publishes the generated `artifacts/pages/` directory on every push to `main`. Kerala News stays at the existing site root; Malayalam TV has its own `/malayalam-tv/` URL and widget icons. Repository scripts, tests, and local browser profiles are not part of the hosted site. GitHub Pages must be configured to use **GitHub Actions** as its publishing source.
 
 Use **https://sajinct.github.io/CloudPhone/** as the widget URL in the Cloud Phone console. The icon is available at **https://sajinct.github.io/CloudPhone/icon-512.png** (or `icon-80.png` for the older size).
 
