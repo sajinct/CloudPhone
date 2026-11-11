@@ -2,7 +2,7 @@
 // A channel-based source may also be used: live_stream?channel=UC_CHANNEL_ID
 export const CHANNELS = Object.freeze([
   { id: "1wECsnGZcfc", name: "24" },
-  { id: "s0LLVQeMmtU", name: "Asianet News" },
+  { id: "0QMlfUjUVzk", name: "Asianet News" },
   { id: "nObUcHKZEGY", name: "Reporter" },
   { id: "Az5I714Nk4M", name: "Big TV" },
   { id: "tgBTspqA5nY", name: "Manorama" },
