@@ -88,11 +88,6 @@ try {
   assert.equal(await evaluate('document.querySelector("video").muted'), false, 'Enable sound unmutes the phone video');
   assert.equal(await evaluate('document.querySelector("video").volume'), 1);
   assert.equal(await evaluate('__volume.at(-1)'), 'up', 'Enable sound raises phone system volume');
-  await key('*');
-  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
-  assert.equal(await evaluate('document.querySelector("video").paused'), true, 'Leaving fullscreen on the phone pauses playback');
-  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false, 'Phone must never opt into silent inline playback');
-  await key('*');
   assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true);
   assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false, 'Phone fullscreen opts into native video display');
   assert.equal(await evaluate('document.querySelector("video").playsInline'), false);
@@ -101,19 +96,16 @@ try {
   await screenshot('malayalam-tv-fullscreen-240x320.png');
   assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
   assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
-  assert.equal(await evaluate('document.getElementById("watch").hidden'), false, 'First Back only exits fullscreen');
-  assert.equal(await evaluate('document.querySelector("video").hasAttribute("x-puffin-playsinline")'), false);
-  assert.equal(await evaluate('document.querySelector("video").paused'), true);
-  await key('Escape');
-  assert.equal(await evaluate('document.activeElement.textContent'), 'Full screen');
+  assert.equal(await evaluate('document.getElementById("browse").hidden'), false, 'One Back returns directly to the channel list');
+  assert.equal(await evaluate('document.querySelectorAll("video").length'), 0, 'One Back releases the stream');
+  assert.match(await evaluate('document.activeElement.textContent'), /One TV/, 'Selected channel is restored');
   await key('Enter');
-  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true, 'Menu offers fullscreen');
+  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true, 'OK opens fullscreen again');
+  await evaluate('document.getElementById("fullscreen-back").click()');
+  assert.equal(await evaluate('document.querySelectorAll("video").length'), 0, 'Onscreen Back also stops playback');
+  await key('Enter');
   await key('*');
-  assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), false);
-  await key('Escape');
-  assert.equal(await evaluate('document.querySelector("video").paused'), true);
-  await key('Escape');
-  assert.equal(await evaluate('document.querySelector("video").paused'), true, 'Closing a menu preserves the paused app view');
+  assert.equal(await evaluate('document.getElementById("browse").hidden'), false, 'Phone fullscreen shortcut returns to channels');
   await key('Enter');
   assert.equal(await evaluate('document.getElementById("app").classList.contains("fullscreen")'), true);
   await key('Escape');
@@ -130,8 +122,6 @@ try {
   await key('Enter');
   await until('document.getElementById("soft-center").textContent === "Pause"');
 
-  assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
-  assert.equal(await evaluate('document.querySelector("video").paused'), true, 'Back from native playback returns a paused view');
   assert.equal(await evaluate('!window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
   assert.equal(await evaluate('document.querySelectorAll("video").length'), 0);
   assert.equal(await evaluate('window.dispatchEvent(new Event("back", {cancelable:true}))'), true);
@@ -180,7 +170,7 @@ try {
     await until('document.getElementById("soft-center").textContent === "Pause"');
     if (width === 240 && height === 320) await screenshot('malayalam-tv-player-240x320.png');
     await key('Backspace');
-    await key('Backspace');
+    assert.equal(await evaluate('document.getElementById("browse").hidden'), false);
   }
 
   // Use a mock MSE player to verify the desktop branch and cleanup independently.

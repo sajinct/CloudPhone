@@ -20,13 +20,15 @@ The app fetches [IPTV-org's Malayalam playlist](https://iptv-org.github.io/iptv/
 | 0 | Enable media sound and show system volume controls (raise one step on phones without a volume-menu API) |
 | * | Toggle full screen while watching; desktop keyboards can also use F |
 | Left soft key / Escape | Options, categories, favorites, refresh and help |
-| Right soft key | Close menu; exit full screen; return from player; exit at the channel list |
+| Right soft key | Stop playback and return directly to the channel list; close a menu; exit at the channel list |
 
 The last selected channel and favorites are saved locally when browser storage is available. Menus pause active playback. Returning to channels stops the stream and releases its player.
 
-**Sound on the Nokia:** device testing found audio works in Cloud Phone's native fullscreen player while inline video is silent. Cloud Phone therefore starts every channel in the native fullscreen player, and never sets the inline opt-out. Leaving fullscreen pauses playback; OK resumes in the native player. Desktop browsers keep embedded playback. **Enable sound** also clears media mute, enables a native audio track when available (preferring Malayalam), and raises system volume one step. Use ↑ / ↓ for further adjustment.
+**Phone flow:** select a channel and press **OK** to watch in fullscreen with sound. Press **Back** once to stop the stream and return directly to the channel list, with that channel still selected.
 
-**Full screen:** automatic on Cloud Phone. On desktop choose the button below the video, **Options → Full screen**, or press **\***. Header, footer and channel details are hidden so the video fills the screen without cropping. No unsupported browser Fullscreen API is required. Press the right soft key or * to leave fullscreen before returning to channels; on desktop, the onscreen Back button is also available. On Cloud Phone leaving fullscreen pauses the video so it does not continue silently in the embedded view.
+**Sound on the Nokia:** device testing found audio works in Cloud Phone's native fullscreen player while inline video is silent. Cloud Phone therefore starts every channel in the native fullscreen player, and never sets the inline opt-out. Desktop browsers keep embedded playback. **Enable sound** also clears media mute, enables a native audio track when available (preferring Malayalam), and raises system volume one step. Use ↑ / ↓ for further adjustment.
+
+**Full screen:** automatic on Cloud Phone. On desktop choose the button below the video, **Options → Full screen**, or press **\***. Header, footer and channel details are hidden so the video fills the screen without cropping. No unsupported browser Fullscreen API is required. Back stops playback and returns directly to channels. On Cloud Phone * also returns to the channel list; desktop * toggles fullscreen and embedded views.
 
 ## Playback
 

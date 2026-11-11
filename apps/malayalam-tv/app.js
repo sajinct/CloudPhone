@@ -344,6 +344,7 @@ function setFullscreen(enabled, resume = true) {
 
 function toggleFullscreen() {
   if (!watching || !video) return;
+  if (isCloudPhone() && fullscreen) { goToChannels(); return; }
   closePanel();
   setFullscreen(!fullscreen);
   if (isCloudPhone() && fullscreen && video.paused && state !== 'error') play();
@@ -379,7 +380,7 @@ function showPanel(kind) {
     const help = document.createElement('div');
     help.className = 'help';
     help.tabIndex = 0;
-    help.innerHTML = '<p><b>Choose a channel</b><br>↑ ↓ browse · OK watch<br>1–9: first nine in this list<br>#: add / remove favorite</p><p><b>While watching</b><br>OK play / pause · ← → channel<br>↑ ↓ volume · 0 sound / volume<br>*: full screen on / off<br>Back: exit full screen, then channels</p><p><b>Sound on CloudPhone</b><br>Channels open in the phone player for sound. Leaving full screen pauses playback. Press OK to watch again. Use ↑ to raise phone volume.</p><p>Left soft key (Escape): options. Filter by category or Favorites. Refresh playlist to get the latest entries.</p><p>Streams come from <a href="https://iptv-org.github.io/iptv/languages/mal.m3u">IPTV-org</a>. Availability depends on the broadcaster and your region. HTTP-only and DASH entries cannot play in this app. Some channels require headers a browser cannot supply.</p>';
+    help.innerHTML = '<p><b>Choose a channel</b><br>↑ ↓ browse · OK watch full screen<br>Back: stop and return to the channel list<br>1–9: first nine in this list<br>#: add / remove favorite</p><p><b>While watching</b><br>OK play / pause · ← → channel<br>↑ ↓ volume · 0 sound / volume</p><p><b>Sound on CloudPhone</b><br>Channels open in the phone player for sound. Use ↑ to raise phone volume.</p><p>Left soft key (Escape): options. Filter by category or Favorites. Refresh playlist to get the latest entries.</p><p>Streams come from <a href="https://iptv-org.github.io/iptv/languages/mal.m3u">IPTV-org</a>. Availability depends on the broadcaster and your region. HTTP-only and DASH entries cannot play in this app. Some channels require headers a browser cannot supply.</p>';
     content.append(help);
     help.focus();
   } else {
@@ -389,7 +390,7 @@ function showPanel(kind) {
       ...[...new Set(channels.flatMap((channel) => channel.groups))].sort().map((group) => [group, () => chooseCategory(group)])
     ] : [
       ...(watching ? [
-        [fullscreen ? 'Exit full screen' : 'Full screen', toggleFullscreen],
+        [fullscreen ? (isCloudPhone() ? 'Channel list' : 'Exit full screen') : 'Full screen', toggleFullscreen],
         ['Enable sound', soundOn],
         ['Volume', () => { closePanel(); changeVolume(0); }],
         ['Retry stream', () => tune(selected)]
@@ -430,7 +431,6 @@ function closePanel(resume = true) {
 
 function back() {
   if (panelKind) { closePanel(); return true; }
-  if (fullscreen) { setFullscreen(false); return true; }
   if (watching) { goToChannels(); return true; }
   return false;
 }
@@ -456,7 +456,7 @@ center.addEventListener('click', primary);
 $('soft-right').addEventListener('click', () => { if (!back()) window.close(); });
 $('sound-on').addEventListener('click', soundOn);
 $('fullscreen-on').addEventListener('click', toggleFullscreen);
-$('fullscreen-back').addEventListener('click', () => setFullscreen(false));
+$('fullscreen-back').addEventListener('click', goToChannels);
 window.addEventListener('back', (event) => { if (back()) event.preventDefault(); });
 window.addEventListener('pagehide', stopPlayer);
 window.addEventListener('pageshow', (event) => { if (event.persisted) goToChannels(); });
